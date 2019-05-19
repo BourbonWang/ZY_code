@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <math.h>
-
+#include"windows.h"
 float f(float x, float y, float z) {
 	float a = x * x + 9.0f / 4.0f * y * y + z * z - 1;
 	return a * a * a - x * x * z * z * z - 9.0f / 80.0f * y * y * z * z * z;
@@ -14,6 +14,8 @@ float h(float x, float z) {
 }
 
 int main() {
+	getchar();
+	system("color 0F");
 	for (float z = 1.5f; z > -1.5f; z -= 0.05f) {
 		for (float x = -1.5f; x < 1.5f; x += 0.025f) {
 			float v = f(x, 0.0f, z);
@@ -25,12 +27,26 @@ int main() {
 				float nd = 1.0f / sqrtf(nx * nx + ny * ny + nz * nz);
 				float d = (nx + ny - nz) * nd * 0.5f + 0.5f;
 				putchar(".:-=+*#%@"[(int)(d * 5.0f)]);
+				Sleep(10);
 			}
 			else
 				putchar(' ');
 		}
 		putchar('\n');
 	}
-	system("pause");
+	COORD pos = {  0,  4 };
+	HANDLE Out = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleCursorPosition(Out, pos);
+	system("color 08");
+	Sleep(500);
+	system("color 0E");
+	Sleep(500);
+	system("color 06");
+	Sleep(500);
+	system("color 0C");
+	Sleep(500);
+	system("color 04");
+	
+	getchar();
 	return 0;
 }
