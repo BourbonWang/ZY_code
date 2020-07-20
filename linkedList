@@ -1,0 +1,232 @@
+type ListNode struct {
+	Val int
+	Next *ListNode
+
+}
+
+func reverseList(head *ListNode) *ListNode{
+	var pre *ListNode
+	for head != nil{
+		next := head.Next
+		head.Next = pre
+		pre = head
+		head = next
+	}
+	return pre
+}
+
+func reverseBetween(head *ListNode, m int, n int) *ListNode {
+	myhead := new(ListNode)
+	myhead.Next = head
+	head = myhead
+	index := 1
+	left := head
+	for index < m - 1{
+		left = left.Next
+		index++
+	}
+	var pre,curr,right,tail *ListNode
+	curr = left.Next
+	right = curr
+	for index < n{
+		next := curr.Next
+		if index == n - 1{tail = curr.Next}
+		curr.Next = pre
+		pre = curr
+		curr = next
+		index++
+	}
+	left.Next = pre
+	right.Next = tail
+	return head.Next
+}
+
+func mergeTwoLists(l1 *ListNode, l2 *ListNode) *ListNode {
+	myhead := &ListNode{}
+	curr := myhead
+	for l1 != nil && l2 != nil{
+		if l1.Val < l2.Val {
+			curr.Next = l1
+			l1 = l1.Next
+		}else{
+			curr.Next = l2
+			l2 = l2.Next
+		}
+		curr = curr.Next
+	}
+	if l1 == nil {
+		curr.Next = l2
+	}else{
+		curr.Next = l1
+	}
+	return myhead.Next
+}
+
+func partition(head *ListNode, x int) *ListNode {
+	myhead,newList := &ListNode{},&ListNode{}
+	myhead.Next = head
+	head = myhead
+	curr := head
+	newListCurr := newList
+	for curr.Next != nil{
+		if curr.Next.Val < x{
+			newListCurr.Next = curr.Next
+			newListCurr = newListCurr.Next
+			curr.Next = curr.Next.Next
+		}else{
+			curr = curr.Next
+		}
+	}
+
+	newListCurr.Next = head.Next
+	return newList.Next
+}
+
+func sortList(head *ListNode) *ListNode {
+	var n int
+	for head != nil{
+		n++
+		head = head.Next
+	}
+	return mergeSort(head,n)
+}
+
+func mergeSort(head *ListNode,n int) *ListNode{
+	if n <= 1{return head}
+	midNode := getNthNode(head,n/2)
+	tail := midNode.Next
+	midNode.Next = nil
+	left := mergeSort(head,n/2)
+	right := mergeSort(tail,n/2)
+	return merge(left,right)
+}
+
+func merge(left *ListNode,right *ListNode) *ListNode{
+	myhead := &ListNode{}
+	curr := myhead
+	for left != nil && right != nil{
+		if left.Val < right.Val{
+			curr.Next = left
+			left = left.Next
+		}else{
+			curr.Next = right
+			right = right.Next
+		}
+		curr = curr.Next
+	}
+	if left == nil{
+		curr.Next = right
+		}else{
+			curr.Next = left
+	}
+	return myhead.Next
+}
+
+func getNthNode(head *ListNode,n int)*ListNode{
+	if n <= 0{return nil}
+	for n > 1{
+		head = head.Next
+		n--
+	}
+	return head
+}
+
+func reorderList(head *ListNode)  {
+	fast := head.Next
+	slow := head
+	for fast != nil && fast.Next != nil{
+		fast = fast.Next.Next
+		slow = slow.Next
+	}
+	right := slow.Next
+	slow.Next = nil
+	reversed := reverseList(right)
+	for reversed != nil{
+		temp := head.Next
+		head.Next = reversed
+		reversed = reversed.Next
+		head.Next.Next = temp
+		head = temp
+	}
+}
+
+func hasCycle(head *ListNode) bool {
+	if head == nil{return false}
+	fast := head.Next
+	slow := head
+	for fast != nil && fast.Next != nil{
+		if fast == slow{return true}
+		fast = fast.Next.Next
+		slow = slow.Next
+	}
+	return false
+}
+
+func detectCycle(head *ListNode) *ListNode {
+	if head == nil{return nil}
+	fast := head.Next
+	slow := head
+	for fast != nil && fast.Next != nil{
+		if fast == slow{
+			slow = head
+			for slow != nil{
+				slow = slow.Next
+				fast = fast.Next
+			}
+			return slow
+		}
+		fast = fast.Next.Next
+		slow = slow.Next
+	}
+	return nil
+}
+
+func isPalindrome(head *ListNode) bool {
+	fast := head.Next
+	slow := head
+	for fast != nil && fast.Next != nil{
+		fast = fast.Next.Next
+		slow = slow.Next
+	}
+	tail := slow.Next
+	slow.Next = nil
+	tail = reverseList(tail)
+	for head != nil && tail != nil{
+		if head.Val != tail.Val{return false}
+		head = head.Next
+		tail = tail.Next
+	}
+	return true
+
+}
+
+type Node struct {
+	     Val int
+	     Next *Node
+	     Random *Node
+	 }
+
+func copyRandomList(head *Node) *Node {
+	nodeMap := make(map[*Node]*Node)
+	myhead := &Node{Val:head.Val}
+	curr := myhead
+	for head.Next != nil{
+		if nodeMap[head.Random] == nil{
+			newNode := &Node{Val:head.Random.Val}
+			nodeMap[head.Random] = newNode
+			curr.Random = newNode
+		}else{
+			curr.Random = nodeMap[head.Random]
+		}
+		if nodeMap[head.Next] == nil{
+			newNode := &Node{Val:head.Next.Val}
+			nodeMap[head.Next] = newNode
+			curr.Next = newNode
+		}else{
+			curr.Next = nodeMap[head.Next]
+		}
+		head = head.Next
+		curr = curr.Next
+	}
+	return myhead
+}
