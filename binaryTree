@@ -1,0 +1,297 @@
+type TreeNode struct {
+	Val int
+	Left *TreeNode
+	Right *TreeNode
+}
+
+func (t *TreeNode)isLeaf() bool {
+	return t.Left == nil && t.Right == nil
+}
+
+func hasPathSum(root *TreeNode, sum int) bool {
+	if root == nil{return false}
+	if root.isLeaf(){
+		if sum == root.Val{
+			return true
+		}else{
+			return false
+		}
+	} else{
+		sum -= root.Val
+		return hasPathSum(root.Left,sum) || hasPathSum(root.Right,sum)
+	}
+}
+
+func inorderTraversal(root *TreeNode) []int {
+	if root == nil{return nil}
+	result := []int{}
+	result = append(result,inorderTraversal(root.Left)...)
+	result = append(result,root.Val)
+	result = append(result,inorderTraversal(root.Right)...)
+	return result
+}
+
+func inorderTraversal2(root *TreeNode) []int {
+	result := []int{}
+	for {
+		if root.Left != nil {
+			left := root.Left
+			curr := left
+			for curr.Right != nil{
+				curr = curr.Right
+			}
+			curr.Right = root
+			root.Left = nil
+			root = left
+		}else{
+			result = append(result,root.Val)
+			if root.Right == nil {break}
+			root = root.Right
+		}
+	}
+	return result
+}
+
+func maxDepth(root *TreeNode) int {
+	if root == nil { return 0}
+	leftDepth := maxDepth(root.Left)
+	rightDepth := maxDepth(root.Right)
+	if leftDepth > rightDepth{
+		return 1 + leftDepth
+	}else{
+		return 1 + rightDepth
+	}
+}
+
+func maxDepth2(root *TreeNode) int {
+	if root == nil {return 0}
+	nodeList := []*TreeNode{}
+	nodeList = append(nodeList,root)
+	depth := 0
+	for len(nodeList) > 0{
+		width := len(nodeList)
+		for i := 0;i < width;i++{
+			root := nodeList[i]
+			if root.Left != nil{
+				nodeList = append(nodeList,root.Left)
+			}
+			if root.Right != nil{
+				nodeList = append(nodeList,root.Right)
+			}
+		}
+		nodeList = nodeList[width:]
+		depth++
+	}
+	return depth
+}
+
+func isBalanced(root *TreeNode) bool {
+	return balance(root) > -1
+}
+
+func balance(root *TreeNode) int {
+	if root == nil {return 0}
+	left := balance(root.Left)
+	right := balance(root.Right)
+	if left == -1 || right == -1 || left - right > 1 || right - left > 1{
+		return -1
+	}else{
+		return max(left,right) + 1
+	}
+}
+
+func maxPathSum(root *TreeNode) int {
+	result := 0
+	maxgain(root,&result)
+	return result
+}
+
+func maxgain(root *TreeNode, result *int) int{
+	if root == nil {return 0}
+	left := max(maxgain(root.Left,result),0)
+	right := max(maxgain(root.Right,result),0)
+	if left + right + root.Val > *result {
+		*result = left + right + root.Val
+	}
+	return max(left,right) + root.Val
+}
+
+func lowestCommonAncestor(root, p, q *TreeNode) *TreeNode {
+	stack := []*TreeNode{}
+	resultStack := []*TreeNode{}
+	var result *TreeNode
+	for root != nil || len(stack) > 0{
+		for root != nil {
+			stack = append(stack,root)
+			if root == p || root == q{
+				if result == nil {
+					resultStack = stack
+					result = root
+				}else{
+					return result
+				}
+			}
+			root = root.Left
+		}
+		pop := stack[len(stack) - 1]
+		stack = stack[:len(stack) - 1]
+		if len(resultStack) > 0 && resultStack[len(resultStack)-1] == pop {
+			result = pop
+			resultStack = resultStack[:len(resultStack)-1]
+		}
+		root = pop.Right
+	}
+	return result
+}
+
+func levelOrder(root *TreeNode) [][]int {
+	if root == nil {return nil}
+	queue := []*TreeNode{}
+	queue = append(queue,root)
+	result := [][]int{}
+	for len(queue) > 0{
+		width := len(queue)
+		list := []int{}
+		for i := 0;i < width;i++{
+			root = queue[i]
+			list = append(list, root.Val)
+			if root.Left != nil {
+				queue = append(queue,root.Left)
+			}
+			if root.Right != nil {
+				queue = append(queue,root.Right)
+			}
+		}
+		queue = queue[width:]
+		result = append(result,list)
+	}
+	return result
+}
+
+func levelOrderBottom(root *TreeNode) [][]int {
+	if root == nil {return nil}
+	queue := []*TreeNode{}
+	queue = append(queue,root)
+	result := [][]int{}
+	for len(queue) > 0{
+		width := len(queue)
+		list := []int{}
+		for i := 0;i < width;i++{
+			root = queue[i]
+			list = append(list, root.Val)
+			if root.Left != nil {
+				queue = append(queue,root.Left)
+			}
+			if root.Right != nil {
+				queue = append(queue,root.Right)
+			}
+		}
+		queue = queue[width:]
+		result = append(result,list)
+	}
+	n := len(result)
+	for i := 0;i < n / 2;i++{
+		temp := result[i]
+		result[i] = result[n-i-1]
+		result[n-i-1] = temp
+	}
+	return result
+}
+
+func zigzagLevelOrder(root *TreeNode) [][]int {
+	if root == nil {return nil}
+	result := [][]int{}
+	queue := []*TreeNode{}
+	queue = append(queue, root)
+	flag := false
+	for len(queue) > 0{
+		width := len(queue)
+		list := []int{}
+		for i := 0;i < width;i++{
+			root = queue[i]
+			list = append(list,root.Val)
+			if root.Left != nil {
+				queue = append(queue,root.Left)
+			}
+			if root.Right != nil {
+				queue = append(queue,root.Right)
+			}
+		}
+		queue = queue[width:]
+		if flag{
+			n := len(list)
+			for i := 0;i < n / 2;i++{
+				temp := list[i]
+				list[i] = list[n-i-1]
+				list[n-i-1] = temp
+			}
+		}
+		result = append(result,list)
+		flag = !flag
+	}
+	return result
+}
+
+func isValidBST(root *TreeNode) bool {
+	//if root == nil {return true}
+	stack := []*TreeNode{}
+	val := -1<<31
+	for root != nil || len(stack) > 0{
+		for root != nil {
+			stack = append(stack,root)
+			root = root.Left
+		}
+		pop := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		if pop.Val <= val{
+			return false
+		}
+		val = pop.Val
+		root = pop.Right
+	}
+	return  true
+}
+
+func insertIntoBST(root *TreeNode, val int) *TreeNode {
+	if root == nil {
+		return &TreeNode{Val:val}
+	}
+	curr := root
+	for {
+		if val < curr.Val{
+			if curr.Left == nil {
+				curr.Left = &TreeNode{Val:val}
+				return root
+			}else{
+				curr = curr.Left
+			}
+		}else if val > curr.Val{
+			if curr.Right == nil {
+				curr.Right = &TreeNode{Val:val}
+				return root
+			}else{
+				curr = curr.Right
+			}
+		}
+	}
+}
+
+func generateTrees(n int) []*TreeNode {
+	return generate(1,n)
+}
+
+func generate(l int,r int) []*TreeNode{
+	if l > r {return nil}
+	treeList := []*TreeNode{}
+	for i := l;i <= r;i++{
+		leftLeafList := generate(l,i - 1)
+		rightleafList := generate(i + 1,r)
+		for _,leftNode := range leftLeafList{
+			for _,rightNode := range rightleafList{
+				newnode := &TreeNode{Val:i,Left:leftNode,Right:rightNode}
+				treeList = append(treeList,newnode)
+			}
+		}
+	}
+	return treeList
+}
