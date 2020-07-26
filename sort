@@ -1,0 +1,82 @@
+func QuickSort(nums []int){
+	quickSort(nums,0,len(nums)-1)
+}
+
+func quickSort(nums []int,left int,right int) {
+	if left >= right {return}
+	pivot := nums[right]
+	l,r := left,right
+	for l < r {
+		for l < r && nums[l] <= pivot{ l++ }
+		for l < r && nums[r] >= pivot{ r-- }
+		swap(nums,l,r)
+	}
+	swap(nums,l,right)
+	quickSort(nums,left,l-1)
+	quickSort(nums,l+1,right)
+}
+
+func MergeSort(nums []int){
+	result := mergeSort(nums)
+	for i,_ := range nums{
+		nums[i] = result[i]
+	}
+}
+
+func mergeSort(nums []int) []int {
+	if len(nums) <= 1 {return nums	}
+	left,right := 0,len(nums)
+	mid := (left + right) / 2
+	leftList := mergeSort(nums[left:mid])
+	rightList := mergeSort(nums[mid:right])
+	result := []int{}
+	left,right = 0,0
+	for left < len(leftList) && right < len(rightList) {
+		if leftList[left] < rightList[right] {
+			result = append(result,leftList[left])
+			left++
+		}else{
+			result = append(result,rightList[right])
+			right++
+		}
+	}
+	result = append(result,leftList[left:]...)
+	result = append(result,rightList[right:]...)
+	return result
+}
+
+func heapSort(nums []int){
+	n := len(nums)
+	for i := n / 2 - 1;i > 0;i--{
+		sink(nums,i,n)
+	}
+	for i := n - 1;i >= 0;i--{
+		swap(nums,0,i)
+		sink(nums,0,i)
+	}
+}
+
+func sink(nums []int,i int,length int){
+	for{
+		l := i * 2 + 1
+		r := i * 2 + 2
+		index := i
+		if l < length && nums[l] > nums[i]{
+			index = l
+		}
+		if r < length && nums[r] > nums[i]{
+			index = r
+		}
+		if index == i {
+			break
+		}
+		swap(nums,i,index)
+		i = index
+	}
+}
+
+func swap(nums []int,i,j int){
+	temp := nums[i]
+	nums[i] = nums[j]
+	nums[j] = temp
+}
