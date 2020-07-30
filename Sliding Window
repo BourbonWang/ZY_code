@@ -1,0 +1,133 @@
+func minWindow(s string, t string) string {
+	table := make(map[uint8]int)
+	for i,_ := range t {
+		table[t[i]]++
+	}
+	result := s
+	left,right := 0,0
+	match := 0
+	for right < len(s){
+		_,ok := table[s[right]]
+		if ok {
+			if table[s[right]] > 0 {
+				match++
+			}
+			table[s[right]]--
+		}
+		right++
+		for left < right{
+			_,ok := table[s[left]]
+			if ok {
+				if table[s[left]] < 0 {
+					table[s[left]]++
+					left++
+				}else{
+					break
+				}
+			}else{
+				left++
+			}
+		}
+		if ok {
+			if match == len(t) && right - left < len(result){
+				result = s[left:right]
+			}
+		}
+	}
+	if match == len(t) {
+		return result
+	}else{
+		return ""
+	}
+}
+
+func checkInclusion(s1 string, s2 string) bool {
+	table := make(map[uint8]int)
+	win := make(map[uint8]int)
+	left,right := 0,0
+	for i,_ := range s1 {
+		table[s1[i]]++
+	}
+	match := 0
+	for right < len(s2) {
+		if table[s2[right]] > 0 {
+			win[s2[right]]++
+			if win[s2[right]] == table[s2[right]] {
+				match++
+			}
+		}
+		right++
+		for right - left > len(s1) {
+			if table[s2[left]] > 0 {
+				if table[s2[left]] == win[s2[left]] {
+					match--
+				}
+				win[s2[left]]--
+			}
+			left++
+		}
+		if match == len(table) {
+			return true
+		}
+	}
+	return false
+}
+
+func findAnagrams(s string, p string) []int {
+	need := make(map[byte]int)
+	win := make(map[byte]int)
+	for i,_ := range p	{
+		need[p[i]]++
+	}
+	left,right := 0,0
+	match := 0
+	result := []int{}
+	for right < len(s) {
+		if need[s[right]] > 0 {
+			win[s[right]]++
+			if win[s[right]] == need[s[right]] {
+				match++
+			}
+		}
+		right++
+		for right - left > len(p) {
+			if need[s[left]] > 0 {
+				if need[s[left]] == win[s[left]] {
+					match--
+				}
+				win[s[left]]--
+			}
+			left++
+		}
+		if match == len(need) {
+			result = append(result,left)
+		}
+	}
+	return result
+}
+
+func lengthOfLongestSubstring(s string) int {
+	left,right := 0,0
+	win := make(map[byte]int)
+	result := 0
+	for right < len(s) {
+		c := s[right]
+		win[c]++
+		right++
+		if win[c] > 1{
+			if result < right - left - 1 {
+				result = right - left - 1
+			}
+			for s[left] != c {
+				win[s[left]]--
+				left++
+			}
+			win[s[left]]--
+			left++
+		}
+	}
+	if right - left > result{
+		result = right - left
+	}
+	return result
+}
